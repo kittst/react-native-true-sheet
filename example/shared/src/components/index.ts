@@ -6,3 +6,7 @@ export * from './ButtonGroup';
 export * from './Spacer';
 export * from './Input';
 export * from './Map';
+export * from './Avatar';
+export * from './MessageItem';
+export * from './ChatBubble';
+export * from './ChatInput';
