@@ -186,7 +186,7 @@ ConversationSheet.displayName = 'ConversationSheet';
 
 const styles = StyleSheet.create({
   chatContent: {
-    paddingTop: SPACING + 100,
+    paddingTop: SPACING + 100, // Additional spacing to clear the footer. Top bc list is inverted.
     paddingBottom: SPACING,
   },
   loadingContainer: {
