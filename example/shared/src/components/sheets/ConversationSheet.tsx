@@ -69,7 +69,8 @@ export const ConversationSheet = forwardRef<ConversationSheetRef, object>((_prop
     setChatCursor(undefined);
     try {
       const response = await fetchChatMessages(conversationId, 20);
-      setChatMessages(response.data.slice().reverse());
+      // Keep chronological order (oldest first, newest last)
+      setChatMessages(response.data);
       setChatHasMore(response.hasMore);
       setChatCursor(response.nextCursor);
     } finally {
@@ -84,7 +85,8 @@ export const ConversationSheet = forwardRef<ConversationSheetRef, object>((_prop
     setChatLoadingMore(true);
     try {
       const response = await fetchChatMessages(selectedConversation.id, 20, chatCursor);
-      setChatMessages((prev) => [...prev, ...response.data.slice().reverse()]);
+      // Prepend older messages at the beginning
+      setChatMessages((prev) => [...response.data, ...prev]);
       setChatHasMore(response.hasMore);
       setChatCursor(response.nextCursor);
     } finally {
@@ -101,10 +103,11 @@ export const ConversationSheet = forwardRef<ConversationSheetRef, object>((_prop
 
     try {
       const newMessage = await sendMessage(selectedConversation.id, text);
-      setChatMessages((prev) => [newMessage, ...prev]);
+      // Append new message at the end
+      setChatMessages((prev) => [...prev, newMessage]);
 
       setTimeout(() => {
-        chatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+        chatListRef.current?.scrollToEnd({ animated: true });
       }, 100);
     } catch {
       setInputText(text);
@@ -126,13 +129,6 @@ export const ConversationSheet = forwardRef<ConversationSheetRef, object>((_prop
       handleBack();
     },
   }));
-
-  const renderChatBubble = useCallback(
-    ({ item }: { item: ChatMessage }) => <ChatBubble message={item} />,
-    []
-  );
-
-  const chatKeyExtractor = useCallback((item: ChatMessage) => item.id, []);
 
   return (
     <TrueSheet
@@ -158,25 +154,32 @@ export const ConversationSheet = forwardRef<ConversationSheetRef, object>((_prop
           <ActivityIndicator size="large" color={GRAY} />
         </View>
       ) : (
-        <FlatList
-          ref={chatListRef}
-          inverted
-          data={chatMessages}
-          renderItem={renderChatBubble}
-          keyExtractor={chatKeyExtractor}
-          keyboardDismissMode="interactive"
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={styles.chatContent}
-          onEndReached={loadMoreChatMessages}
-          onEndReachedThreshold={0.3}
-          ListFooterComponent={
-            chatLoadingMore ? (
-              <View style={styles.headerLoader}>
-                <ActivityIndicator size="small" color={GRAY} />
-              </View>
-            ) : null
-          }
-        />
+        <View style={styles.listWrapper}>
+          <FlatList
+            ref={chatListRef}
+            nestedScrollEnabled
+            data={chatMessages}
+            renderItem={({ item }) => <ChatBubble message={item} />}
+            keyExtractor={(item) => item.id}
+            keyboardDismissMode="interactive"
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={styles.chatContent}
+            onScroll={({ nativeEvent }) => {
+              // Load more when scrolling near the top
+              if (nativeEvent.contentOffset.y < 100) {
+                loadMoreChatMessages();
+              }
+            }}
+            scrollEventThrottle={100}
+            ListHeaderComponent={
+              chatLoadingMore ? (
+                <View style={styles.headerLoader}>
+                  <ActivityIndicator size="small" color={GRAY} />
+                </View>
+              ) : null
+            }
+          />
+        </View>
       )}
     </TrueSheet>
   );
@@ -185,9 +188,12 @@ export const ConversationSheet = forwardRef<ConversationSheetRef, object>((_prop
 ConversationSheet.displayName = 'ConversationSheet';
 
 const styles = StyleSheet.create({
+  listWrapper: {
+    flex: 1,
+  },
   chatContent: {
-    paddingTop: SPACING + 100, // Additional spacing to clear the footer. Top bc list is inverted.
-    paddingBottom: SPACING,
+    paddingTop: SPACING,
+    paddingBottom: SPACING + 100, // Additional spacing to clear the footer
   },
   loadingContainer: {
     flex: 1,
