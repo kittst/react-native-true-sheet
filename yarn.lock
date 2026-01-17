@@ -3468,6 +3468,7 @@ __metadata:
     "@react-native/typescript-config": "npm:0.82.1"
     "@react-navigation/native": "npm:^7.1.26"
     "@react-navigation/native-stack": "npm:^7.9.0"
+    "@shopify/flash-list": "npm:^2.2.0"
     "@types/react": "npm:~19.1.10"
     react: "npm:19.1.1"
     react-native: "npm:0.82.1"
@@ -3522,6 +3523,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@example/shared@workspace:example/shared"
   dependencies:
+    "@shopify/flash-list": "npm:^2.2.0"
     "@types/react": "npm:19.1.1"
     react-native-gesture-handler: "npm:^2.29.1"
     react-native-maps: "npm:^1.26.20"
@@ -6248,6 +6250,17 @@ __metadata:
   peerDependencies:
     release-it: ^18.0.0 || ^19.0.0
   checksum: 10c0/bd8860daea63bbad902f7fe9bff8ae956128bbe825900c5deec2c72119063a4f83be87906d0a05438522b60c0e7e8fa989ac0dc72bdc394c17983a0b2403e611
+  languageName: node
+  linkType: hard
+
+"@shopify/flash-list@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "@shopify/flash-list@npm:2.2.0"
+  peerDependencies:
+    "@babel/runtime": "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/ce6bb2096abf1b826e716804106013955c145c0c37d3a277ce294eb0044047af1aeea410fd7c297cc1352b6029b853de5fca2503340f116ccd0281049290625e
   languageName: node
   linkType: hard
 
